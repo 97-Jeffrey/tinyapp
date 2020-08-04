@@ -49,7 +49,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL, longURL };
   res.render("urls_show", templateVars);
 });
-
+// link the generated url to the real url users submitted, and redirect user into their address:
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   console.log('longURL===',longURL);
@@ -57,7 +57,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 })
 
-
+// direct to urls add the input address into urlDatabase, new string generated for given address:
 app.post("/urls", (req, res) => {
   let randomString = generateRandomString();
  
