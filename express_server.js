@@ -72,8 +72,17 @@ app.post("/urls/:shortURL/delete", (req, res)=>{
   res.redirect("/urls");
 })
 
-app.post('/urls/:id',(req, res)=>{
-  urlDatabase[req.params.id] = req.body['longURL'];
+app.get('/urls/:shortURL/edit',(req, res)=>{
+  console.log(req.params);
+  res.redirect(`/urls/${req.params.shortURL}`);
+})
+
+
+app.post('/urls/:shortURL/edit',(req, res)=>{
+  // console.log(urlDatabase[req.params.shortURL]);
+  // console.log(req.body["longURL"]);
+  // console.log(req.params.shortURL);
+  urlDatabase[req.params.shortURL] = req.body['longURL'];
   res.redirect("/urls");
 })
 
