@@ -36,7 +36,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase, username:req.cookies['username'] };
   res.render('urls_index', templateVars);
 });
 
@@ -94,6 +94,7 @@ app.post('/login',(req, res)=>{
   res.cookie('username', req.body.username);
   res.redirect("/urls");
 })
+
 
 app.listen(PORT, () => {
   console.log(`Example app is listening on port ${PORT}`);
