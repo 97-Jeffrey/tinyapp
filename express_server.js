@@ -27,6 +27,8 @@ app.get("/", (req, res) => {
   res.send("Hello");
 });
 
+
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -47,7 +49,8 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
-  let templateVars = { shortURL, longURL };
+  const username = req.cookies['username'];
+  let templateVars = { shortURL, longURL, username};
   res.render("urls_show", templateVars);
 });
 // link the generated url to the real url users submitted, and redirect user into their address:
@@ -90,9 +93,14 @@ app.post('/urls/:shortURL/edit',(req, res)=>{
 
 //below are cookie cases:
 app.post('/login',(req, res)=>{
-  console.log(req.body.username);
   res.cookie('username', req.body.username);
   res.redirect("/urls");
+})
+
+app.post('/logout', (req, res)=>{
+  // console.log(req.cookies)
+  res.clearCookie('username');
+  res.redirect('/urls');
 })
 
 
