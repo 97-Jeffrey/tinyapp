@@ -12,6 +12,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+
 function generateRandomString() {
   let alphaNum = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let randomString = '';
@@ -20,6 +21,9 @@ function generateRandomString() {
   }
   return randomString;
 }
+
+
+
 
 
 // app.get("/", (req, res) => {
@@ -36,6 +40,15 @@ function generateRandomString() {
 // });
 
 
+//user authentication:
+app.get('/urls/register', (req, res)=>{
+  
+  res.render('urls_register');
+})
+
+
+
+
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase, username:req.cookies['username'] };
@@ -43,7 +56,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { urls: urlDatabase, username:req.cookies['username'] };
+   let templateVars = { urls: urlDatabase, username:req.cookies['username'] };
   res.render("urls_new", templateVars);
 })
 
@@ -54,6 +67,8 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL, longURL, username};
   res.render("urls_show", templateVars);
 });
+
+
 // link the generated url to the real url users submitted, and redirect user into their address:
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
@@ -65,11 +80,8 @@ app.get("/u/:shortURL", (req, res) => {
 // direct to urls add the input address into urlDatabase, new string generated for given address:
 app.post("/urls", (req, res) => {
   let randomString = generateRandomString();
- 
   urlDatabase[randomString] = req.body["longURL"];
-  
   res.redirect(`/urls/${randomString}`);
-  
 });
 
 app.post("/urls/:shortURL/delete", (req, res)=>{
@@ -90,6 +102,7 @@ app.post('/urls/:shortURL/edit',(req, res)=>{
   urlDatabase[req.params.shortURL] = req.body['longURL'];
   res.redirect("/urls");
 })
+
 
 
 //below are cookie cases:
