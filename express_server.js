@@ -20,22 +20,22 @@ function generateRandomString() {
   }
   return randomString;
 }
-// const randomString = generateRandomString();
-// console.log(generateRandomString());
-
-app.get("/", (req, res) => {
-  res.send("Hello");
-});
 
 
+// app.get("/", (req, res) => {
+//   res.send("Hello");
+// });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n")
-});
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
+
+// app.get("/hello", (req, res) => {
+//   res.send("<html><body>Hello <b>World</b></body></html>\n")
+// });
+
+
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase, username:req.cookies['username'] };
@@ -99,12 +99,15 @@ app.post('/login',(req, res)=>{
 })
 
 app.post('/logout', (req, res)=>{
-  // console.log(req.cookies)
   res.clearCookie('username');
   res.redirect('/urls');
 })
 
 
+
+
+
+// app starts operation:
 app.listen(PORT, () => {
   console.log(`Example app is listening on port ${PORT}`);
 });
