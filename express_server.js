@@ -48,29 +48,19 @@ const getUserbyEmail = function (email) {
 
 
 
-// app.get("/", (req, res) => {
-//   res.send("Hello");
-// });
-
-
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
-
-// app.get("/hello", (req, res) => {
-//   res.send("<html><body>Hello <b>World</b></body></html>\n")
-// });
-
 
 //user authentication:
 
-app.get('/urls/register', (req, res) => {
+app.get('/register', (req, res) => {
   res.render('urls_register');
 })
 
-app.get('/urls/login', (req,res)=>{
+app.get('/login', (req,res)=>{
   res.render('urls_login');
 })
+
+
+
 
 app.post('/register', (req, res) => {
   const randomId = generateRandomString();
@@ -167,7 +157,7 @@ app.post('/login', (req, res) => {
 
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/urls');
+  res.redirect('/urls/login/');
 })
 
 
