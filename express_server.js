@@ -88,6 +88,13 @@ app.post('/urls/:shortURL/edit',(req, res)=>{
 })
 
 
+//below are cookie cases:
+app.post('/login',(req, res)=>{
+  console.log(req.body.username);
+  res.cookie('username', req.body.username);
+  res.redirect("/urls");
+})
+
 app.listen(PORT, () => {
   console.log(`Example app is listening on port ${PORT}`);
 });
