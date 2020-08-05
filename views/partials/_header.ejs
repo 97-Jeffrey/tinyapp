@@ -9,12 +9,23 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
+     <% if (!username){ %>
       <form action="/login/" method ='POST' style='position: absolute; left:650px; top:10px'>
         <input type="text" placeholder="username" name='username'>
         <button type="submit" class="btn btn-primary">login</button>
-        <!-- <p>Loggin in As <%= username %></p> -->
       </form>
-      <p style='position: absolute; left:500px; top:14px; font-weight: normal' >Loggin in As <%= username %></p>
+      <% } else { %>
+      
+        <form action="/logout/" method ='POST' style='position: absolute; left:650px; top:10px'>
+          <button type="submit" class="btn btn-primary">logout</button>
+        </form>
+
+        <% } %>
+         <p style='position: absolute; left:450px; top:14px; font-weight: normal' >Loggin in As <%= username %></p>
+        
+        
+        
+      
     </div>
   </nav>
 </header>
