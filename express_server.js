@@ -63,8 +63,13 @@ const getUserbyEmail = function (email) {
 
 
 //user authentication:
+
 app.get('/urls/register', (req, res) => {
   res.render('urls_register');
+})
+
+app.get('/urls/login', (req,res)=>{
+  res.render('urls_login');
 })
 
 app.post('/register', (req, res) => {
