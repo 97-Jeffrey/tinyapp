@@ -114,6 +114,9 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   let templateVars = { urls: urlDatabase, user_id: req.cookies['user_id'] };
+  if(!templateVars["user_id"]){
+    res.redirect('/login');
+  }
   res.render("urls_new", templateVars);
 })
 
