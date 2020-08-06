@@ -109,18 +109,18 @@ app.post('/register', (req, res) => {
 app.get("/urls", (req, res) => {
   let filterURL ={};
   for(let url in urlDatabase){
-    console.log(req.cookies['user_id'], urlDatabase[url].userID);
+    // console.log(req.cookies['user_id'], urlDatabase[url].userID);
     if(urlDatabase[url].userID === req.cookies['user_id'] ){
       filterURL[url] = urlDatabase[url];
     }
   }
-  console.log(filterURL);
+  // console.log(filterURL);
   let templateVars = { urls: filterURL, user_id: users[req.cookies['user_id']]};
   res.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { urls: urlDatabase, user_id: req.cookies['user_id'] };
+  let templateVars = { urls: urlDatabase, user_id: users[req.cookies['user_id']]};
   if(!templateVars["user_id"]){
     res.redirect('/login');
   }
@@ -130,7 +130,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
-  const user_id = req.cookies['user_id'];
+  const user_id = users[req.cookies['user_id']];
   let templateVars = { shortURL, longURL, user_id };
   res.render("urls_show", templateVars);
 });
@@ -153,28 +153,40 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect("/urls");
+console.log('this is for delete  --->',urlDatabase[req.params.shortURL].userID);
+console.log('this is  cookie  --->',req.cookies['user_id']);
+console.log(urlDatabase[req.params.shortURL].userID === req.cookies['user_id'])
+  if(urlDatabase[req.params.shortURL].userID === req.cookies['user_id']){
+    delete urlDatabase[req.params.shortURL];
+    res.redirect("/urls");
+  }else{
+    res.send('error 404: cannot delete');
+  }
 })
 
 app.get('/urls/:shortURL/edit', (req, res) => {
-  console.log(req.params);
+  // console.log(req.params);
   res.redirect(`/urls/${req.params.shortURL}`);
 })
 
 
 app.post('/urls/:shortURL/edit', (req, res) => {
-
+   console.log('this is shortURL',req.params.shortURL);
+   console.log('this is another one', urlDatabase[req.params.shortURL])
   // console.log(' iam  printing shorturl',req.params.shortURL)
   // console.log('longURL ===?',req.body["longURL"]);
   // console.log(req.params.shortURL);
-  urlDatabase[req.params.shortURL]["longURL"] = req.body['longURL'];
-  res.redirect("/urls");
+  if(urlDatabase[req.params.shortURL]["userID"] === req.cookies['user_id']){
+    urlDatabase[req.params.shortURL]["longURL"] = req.body['longURL'];
+    res.redirect("/urls");
+  }
+  // urlDatabase[req.params.shortURL]["longURL"] = req.body['longURL'];
+  // res.redirect("/urls");
 })
 
 
 
-//below are cookie cases:
+
 app.post('/login', (req, res) => {
   const user = req.body;
   if (!getUserbyEmail(user.email)) {
@@ -208,31 +220,15 @@ app.listen(PORT, () => {
 
 
 
-// const getUserBypassword = function(email,password){
-//   let arr =Object.keys(users);
-//   let result;
-//   for(let user of arr){
-//     if(arr[user].email === email){
-//       if(arr[user].password === password){
-//          result = true;
-//       }
-//     }
-//   }
-//   return result;
-// }
 
 
 
 
 
-// const getUserbyEmail = function (email) {
-//   let result = '';
-//   let arr = Object.keys(users);
-//   for (let user of arr) {
-//     if (users[user].email === email) {
-//       result = user;
-//       break;
-//     }
-//   }
-//   return result;
-// }
+
+
+
+
+
+
+
