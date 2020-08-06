@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const PORT = 8080;
 const bodyParser = require('body-parser');
+const { getUserbyEmail } = require('./helpers');
 //const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
@@ -42,17 +43,17 @@ function generateRandomString() {
 
 
 // two helper functions:
-const getUserbyEmail = function (email, database) {
-  let result = '';
-  let arr = Object.keys(database);
-  for (let user of arr) {
-    if (database[user].email === email) {
-      result = user;
-      break;
-    }
-  }
-  return result;
-}
+// const getUserbyEmail = function (email, database) {
+//   let result = '';
+//   let arr = Object.keys(database);
+//   for (let user of arr) {
+//     if (database[user].email === email) {
+//       result = user;
+//       break;
+//     }
+//   }
+//   return result;
+// }
 
 const getUserbyEmail2 = function(email){
   let result = '';
