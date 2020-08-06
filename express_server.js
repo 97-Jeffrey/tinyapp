@@ -7,9 +7,12 @@ const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+// app.use(cookieParser());
 app.set('view engine', "ejs");
-
+app.use(cookieSession({
+  name: 'week3day4',
+  keys: ['my-secret-dont-tell']
+}));
 
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
@@ -81,12 +84,12 @@ const getUserBypassword = function(email,password){
 //user authentication:
 
 app.get('/register', (req, res) => {
-  let templateVars = { urls: urlDatabase, user_id: users[req.cookies['user_id']] };
+  let templateVars = { urls: urlDatabase, user_id: users[req.session['user_id']] };
   res.render('urls_register', templateVars);
 })
 
 app.get('/login', (req, res) => {
-  let templateVars = { urls: urlDatabase, user_id: users[req.cookies['user_id']] };
+  let templateVars = { urls: urlDatabase, user_id: users[req.session['user_id']] };
   res.render('urls_login', templateVars);
 })
 
@@ -111,7 +114,8 @@ app.post('/register', (req, res) => {
     users[randomId]['email'] = user.email;
     users[randomId]['password'] = hashedPassword;
     console.log(users);
-    res.cookie('user_id', randomId);
+    //res.cookie('user_id', randomId); // 
+    req.session.user_id = randomId; 
     res.redirect('/urls');
   }
 
@@ -127,17 +131,17 @@ app.get("/urls", (req, res) => {
   let filterURL ={};
   for(let url in urlDatabase){
     // console.log(req.cookies['user_id'], urlDatabase[url].userID);
-    if(urlDatabase[url].userID === req.cookies['user_id'] ){
+    if(urlDatabase[url].userID === req.session['user_id'] ){
       filterURL[url] = urlDatabase[url];
     }
   }
   // console.log(filterURL);
-  let templateVars = { urls: filterURL, user_id: users[req.cookies['user_id']]};
+  let templateVars = { urls: filterURL, user_id: users[req.session['user_id']]};
   res.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { urls: urlDatabase, user_id: users[req.cookies['user_id']]};
+  let templateVars = { urls: urlDatabase, user_id: users[req.session['user_id']]};
   if(!templateVars["user_id"]){
     res.redirect('/login');
   }
@@ -147,7 +151,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
-  const user_id = users[req.cookies['user_id']];
+  const user_id = users[req.session['user_id']];
   let templateVars = { shortURL, longURL, user_id };
   res.render("urls_show", templateVars);
 });
@@ -165,13 +169,13 @@ app.get("/u/:shortURL", (req, res) => {
 // direct to urls add the input address into urlDatabase, new string generated for given address:
 app.post("/urls", (req, res) => {
   let randomString = generateRandomString();
-  urlDatabase[randomString] = {longURL: req.body.longURL, userID: req.cookies['user_id']};
+  urlDatabase[randomString] = {longURL: req.body.longURL, userID: req.session['user_id']};
   res.redirect(`/urls/${randomString}`);
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
 
-  if(urlDatabase[req.params.shortURL].userID === req.cookies['user_id']){
+  if(urlDatabase[req.params.shortURL].userID === req.session['user_id']){
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
   }else{
@@ -185,10 +189,9 @@ app.get('/urls/:shortURL/edit', (req, res) => {
 
 
 app.post('/urls/:shortURL/edit', (req, res) => {
-   console.log('this is shortURL',req.params.shortURL);
-   console.log('this is another one', urlDatabase[req.params.shortURL])
   
-  if(urlDatabase[req.params.shortURL]["userID"] === req.cookies['user_id']){
+  
+  if(urlDatabase[req.params.shortURL]["userID"] === req.session['user_id']){
     urlDatabase[req.params.shortURL]["longURL"] = req.body['longURL'];
     res.redirect("/urls");
   }
@@ -213,7 +216,7 @@ app.post('/login', (req, res) => {
 
   }else{
     console.log('this is  the email',otherUser);
-    res.cookie('user_id', otherUser);
+    req.session['user_id'] = otherUser;
     res.redirect("/urls");
   }
 })
@@ -221,7 +224,8 @@ app.post('/login', (req, res) => {
 
 //res.redirect("/urls");
 app.get('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  // res.clearCookie('user_id');
+  req.session.user_id = null;
   res.redirect('/login');
 })
 
