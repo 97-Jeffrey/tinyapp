@@ -4,7 +4,7 @@ const PORT = 8080;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
-const password = "purple-monkey-dinosaur";
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set('view engine', "ejs");
@@ -50,6 +50,18 @@ const getUserbyEmail = function (email) {
   return result;
 }
 
+const getUserbyEmail2 = function(email){
+  let result = '';
+  let arr = Object.keys(users);
+  for (let user of arr) {
+    if (users[user].email === email) {
+      result = users[user].password;
+      break;
+    }
+  }
+  return result;
+}
+// helper function
 const getUserBypassword = function(email,password){
   let arr =Object.keys(users);
   let result;
@@ -83,8 +95,9 @@ app.get('/login', (req, res) => {
 app.post('/register', (req, res) => {
   const randomId = generateRandomString();
   const user = req.body;
-  const arr = Object.keys(users);
-
+  // const arr = Object.keys(users);
+  const password = user.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   if (!user.email || !user.password) {
     res.send(`Error code 400 : please fill in both Email and password`);
   }
@@ -95,7 +108,7 @@ app.post('/register', (req, res) => {
     users[randomId] = {};
     users[randomId]['id'] = randomId;
     users[randomId]['email'] = user.email;
-    users[randomId]['password'] = user.password;
+    users[randomId]['password'] = hashedPassword;
     console.log(users);
     res.cookie('user_id', randomId);
     res.redirect('/urls');
@@ -156,9 +169,9 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-console.log('this is for delete  --->',urlDatabase[req.params.shortURL].userID);
-console.log('this is  cookie  --->',req.cookies['user_id']);
-console.log(urlDatabase[req.params.shortURL].userID === req.cookies['user_id'])
+// console.log('this is for delete  --->',urlDatabase[req.params.shortURL].userID);
+// console.log('this is  cookie  --->',req.cookies['user_id']);
+// console.log(urlDatabase[req.params.shortURL].userID === req.cookies['user_id'])
   if(urlDatabase[req.params.shortURL].userID === req.cookies['user_id']){
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
@@ -176,15 +189,12 @@ app.get('/urls/:shortURL/edit', (req, res) => {
 app.post('/urls/:shortURL/edit', (req, res) => {
    console.log('this is shortURL',req.params.shortURL);
    console.log('this is another one', urlDatabase[req.params.shortURL])
-  // console.log(' iam  printing shorturl',req.params.shortURL)
-  // console.log('longURL ===?',req.body["longURL"]);
-  // console.log(req.params.shortURL);
+  
   if(urlDatabase[req.params.shortURL]["userID"] === req.cookies['user_id']){
     urlDatabase[req.params.shortURL]["longURL"] = req.body['longURL'];
     res.redirect("/urls");
   }
-  // urlDatabase[req.params.shortURL]["longURL"] = req.body['longURL'];
-  // res.redirect("/urls");
+ 
 })
 
 
@@ -192,18 +202,24 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 
 app.post('/login', (req, res) => {
   const user = req.body;
+  console.log('this is user',user);
+  const password = user.password;
+  const email = user.email;
+  const dbHash = getUserbyEmail2(email);
+  const correct = bcrypt.compareSync(password, dbHash);
+  const otherUser = getUserbyEmail(email);
   if (!getUserbyEmail(user.email)) {
     res.send('Error 403: the e-mail cannot be found!')
-  } else if(!getUserBypassword(user.email, user.password)) {
+  } else if(!correct) {
     res.send('Error 403: the password is not correct')
 
   }else{
-    // getUserBypassword(user.email, user.password)
-    res.cookie('user_id', getUserBypassword(user.email, user.password));
+    console.log('this is  the email',otherUser);
+    res.cookie('user_id', otherUser);
     res.redirect("/urls");
   }
 })
-
+//!getUserBypassword(user.email, user.password)
 
 //res.redirect("/urls");
 app.get('/logout', (req, res) => {
