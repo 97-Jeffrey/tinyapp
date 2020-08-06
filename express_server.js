@@ -65,12 +65,12 @@ const getUserBypassword = function(email,password){
 //user authentication:
 
 app.get('/register', (req, res) => {
-  let templateVars = { urls: urlDatabase, user_id: users[req.cookies['user_id']] && users[req.cookies['user_id']].email };
+  let templateVars = { urls: urlDatabase, user_id: users[req.cookies['user_id']] };
   res.render('urls_register', templateVars);
 })
 
 app.get('/login', (req, res) => {
-  let templateVars = { urls: urlDatabase, user_id: users[req.cookies['user_id']] && users[req.cookies['user_id']].email };
+  let templateVars = { urls: urlDatabase, user_id: users[req.cookies['user_id']] };
   res.render('urls_login', templateVars);
 })
 
@@ -138,9 +138,10 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // link the generated url to the real url users submitted, and redirect user into their address:
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  console.log('longURL===', longURL);
-  console.log(req.params.shortURL);
+  const shortURL = req.params.shortURL;
+  const longURL = req.body.longURL;
+  //  console.log('longURL===', longURL);
+  console.log(req.params);
   res.redirect(longURL);
 })
 
@@ -150,7 +151,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[randomString] = {longURL: req.body.longURL, userID: req.cookies['user_id']};
   res.redirect(`/urls/${randomString}`);
 });
-//req.body["longURL"];
+
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
@@ -163,10 +164,11 @@ app.get('/urls/:shortURL/edit', (req, res) => {
 
 
 app.post('/urls/:shortURL/edit', (req, res) => {
-  // console.log(urlDatabase[req.params.shortURL]);
-  // console.log(req.body["longURL"]);
+
+  // console.log(' iam  printing shorturl',req.params.shortURL)
+  // console.log('longURL ===?',req.body["longURL"]);
   // console.log(req.params.shortURL);
-  urlDatabase[req.params.shortURL] = req.body['longURL'];
+  urlDatabase[req.params.shortURL]["longURL"] = req.body['longURL'];
   res.redirect("/urls");
 })
 
@@ -174,7 +176,6 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 
 //below are cookie cases:
 app.post('/login', (req, res) => {
-  // res.cookie('user_id', req.body.user_id);
   const user = req.body;
   if (!getUserbyEmail(user.email)) {
     res.send('Error 403: the e-mail cannot be found!')
