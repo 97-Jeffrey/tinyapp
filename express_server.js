@@ -169,9 +169,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-// console.log('this is for delete  --->',urlDatabase[req.params.shortURL].userID);
-// console.log('this is  cookie  --->',req.cookies['user_id']);
-// console.log(urlDatabase[req.params.shortURL].userID === req.cookies['user_id'])
+
   if(urlDatabase[req.params.shortURL].userID === req.cookies['user_id']){
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
@@ -181,7 +179,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 })
 
 app.get('/urls/:shortURL/edit', (req, res) => {
-  // console.log(req.params);
   res.redirect(`/urls/${req.params.shortURL}`);
 })
 
@@ -219,7 +216,7 @@ app.post('/login', (req, res) => {
     res.redirect("/urls");
   }
 })
-//!getUserBypassword(user.email, user.password)
+
 
 //res.redirect("/urls");
 app.get('/logout', (req, res) => {
