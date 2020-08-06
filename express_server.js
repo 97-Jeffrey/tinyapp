@@ -225,10 +225,7 @@ app.get('/logout', (req, res) => {
 })
 
 
-
-
-
-// app starts operation:
+// app starts listening at designated port:
 app.listen(PORT, () => {
   console.log(`Example app is listening on port ${PORT}`);
 });
