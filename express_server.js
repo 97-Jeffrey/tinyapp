@@ -66,12 +66,12 @@ const getUserBypassword = function(email,password){
 //user authentication:
 
 app.get('/register', (req, res) => {
-  let templateVars = { urls: urlDatabase, username: users[req.cookies['user_id']] && users[req.cookies['user_id']].email };
+  let templateVars = { urls: urlDatabase, user_id: users[req.cookies['user_id']] && users[req.cookies['user_id']].email };
   res.render('urls_register', templateVars);
 })
 
 app.get('/login', (req, res) => {
-  let templateVars = { urls: urlDatabase, username: users[req.cookies['user_id']] && users[req.cookies['user_id']].email };
+  let templateVars = { urls: urlDatabase, user_id: users[req.cookies['user_id']] && users[req.cookies['user_id']].email };
   res.render('urls_login', templateVars);
 })
 
@@ -108,20 +108,20 @@ app.post('/register', (req, res) => {
 
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase, username: users[req.cookies['user_id']] && users[req.cookies['user_id']].email };
+  let templateVars = { urls: urlDatabase, user_id: users[req.cookies['user_id']] && users[req.cookies['user_id']].email };
   res.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { urls: urlDatabase, username: req.cookies['user_id'] };
+  let templateVars = { urls: urlDatabase, user_id: req.cookies['user_id'] };
   res.render("urls_new", templateVars);
 })
 
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
-  const username = req.cookies['user_id'];
-  let templateVars = { shortURL, longURL, username };
+  const user_id = req.cookies['user_id'];
+  let templateVars = { shortURL, longURL, user_id };
   res.render("urls_show", templateVars);
 });
 
@@ -164,7 +164,7 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 
 //below are cookie cases:
 app.post('/login', (req, res) => {
-  // res.cookie('username', req.body.username);
+  // res.cookie('user_id', req.body.user_id);
   const user = req.body;
   if (!getUserbyEmail(user.email)) {
     res.send('Error 403: the e-mail cannot be found!')
