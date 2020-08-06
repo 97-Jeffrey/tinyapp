@@ -42,11 +42,11 @@ function generateRandomString() {
 
 
 // two helper functions:
-const getUserbyEmail = function (email) {
+const getUserbyEmail = function (email, database) {
   let result = '';
-  let arr = Object.keys(users);
+  let arr = Object.keys(database);
   for (let user of arr) {
-    if (users[user].email === email) {
+    if (database[user].email === email) {
       result = user;
       break;
     }
@@ -105,7 +105,7 @@ app.post('/register', (req, res) => {
   if (!user.email || !user.password) {
     res.send(`Error code 400 : please fill in both Email and password`);
   }
-  else if (getUserbyEmail(user.email)) {
+  else if (getUserbyEmail(user.email, users)) {                           // right here!!!!
     res.send(`Error code 400 : this email is already registered`);
 
   } else {
@@ -208,14 +208,14 @@ app.post('/login', (req, res) => {
   const email = user.email;
   const dbHash = getUserbyEmail2(email);
   const correct = bcrypt.compareSync(password, dbHash);
-  const otherUser = getUserbyEmail(email);
-  if (!getUserbyEmail(user.email)) {
+  const otherUser = getUserbyEmail(email, users);                // here
+  if (!getUserbyEmail(user.email, users)) {                      //here
     res.send('Error 403: the e-mail cannot be found!')
   } else if(!correct) {
     res.send('Error 403: the password is not correct')
 
   }else{
-    console.log('this is  the email',otherUser);
+    
     req.session['user_id'] = otherUser;
     res.redirect("/urls");
   }
