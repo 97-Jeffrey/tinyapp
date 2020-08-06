@@ -34,6 +34,8 @@ function generateRandomString() {
   return randomString;
 }
 
+
+// two helper functions:
 const getUserbyEmail = function (email) {
   let result = '';
   let arr = Object.keys(users);
@@ -46,6 +48,18 @@ const getUserbyEmail = function (email) {
   return result;
 }
 
+const getUserBypassword = function(email,password){
+  let arr =Object.keys(users);
+  let result;
+  for(let user of arr){
+    if(users[user].email === email){
+      if(users[user].password === password){
+         result = true;
+      }
+    }
+  }
+  return result;
+}
 
 
 
@@ -55,7 +69,7 @@ app.get('/register', (req, res) => {
   res.render('urls_register');
 })
 
-app.get('/login', (req,res)=>{
+app.get('/login', (req, res) => {
   res.render('urls_login');
 })
 
@@ -86,9 +100,6 @@ app.post('/register', (req, res) => {
 })
 
 
-
-
-// console.log(req.cookies['user_id']);
 
 
 
@@ -151,10 +162,20 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 
 //below are cookie cases:
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect("/urls");
+  // res.cookie('username', req.body.username);
+  const user = req.body;
+  if (!getUserbyEmail(user.email)) {
+    res.send('Error 403: the e-mail cannot be found!')
+  } else if(!getUserBypassword(user.email, user.password)) {
+    res.send('Error 403: the password is not correct')
+
+  }else{
+    res.redirect("/urls");
+  }
 })
 
+
+//res.redirect("/urls");
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
   res.redirect('/urls/login/');
@@ -168,3 +189,35 @@ app.post('/logout', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app is listening on port ${PORT}`);
 });
+
+
+
+
+// const getUserBypassword = function(email,password){
+//   let arr =Object.keys(users);
+//   let result;
+//   for(let user of arr){
+//     if(arr[user].email === email){
+//       if(arr[user].password === password){
+//          result = true;
+//       }
+//     }
+//   }
+//   return result;
+// }
+
+
+
+
+
+// const getUserbyEmail = function (email) {
+//   let result = '';
+//   let arr = Object.keys(users);
+//   for (let user of arr) {
+//     if (users[user].email === email) {
+//       result = user;
+//       break;
+//     }
+//   }
+//   return result;
+// }
