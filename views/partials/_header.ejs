@@ -10,16 +10,20 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-     <% if('user_id'){ %>
+     <% if(!username){ %>
       <a href="/login"  style='position: absolute; right:120px; top:10px'>
         <button type="submit" class="btn btn-primary">login</button>
       </a>
-    <% }  %>
-
+    <% } else { %>
+      <a href="/logout"  style='position: absolute; right:120px; top:10px'>
+        <button type="submit" class="btn btn-primary">logout</button>
+      </a>
+      <p style='position: absolute; left:450px; top:14px; font-weight: normal'>Loggin in As <%= username %></p>
+      <% } %>
       <a href="/register"  style='position: absolute; right:20px; top:10px'>
         <button type="submit" class="btn btn-primary">Register</button>
       </a>
-      <p style='position: absolute; left:450px; top:14px; font-weight: normal'>Loggin in As <%= username %></p>
+      <!-- <p style='position: absolute; left:450px; top:14px; font-weight: normal'>Loggin in As <%= username %></p> -->
       
 
 
