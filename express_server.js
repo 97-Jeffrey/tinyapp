@@ -54,11 +54,11 @@ const getUserBypassword = function(email,password){
   for(let user of arr){
     if(users[user].email === email){
       if(users[user].password === password){
-         result = true;
+        return user;
       }
     }
   }
-  return result;
+  
 }
 
 
@@ -66,11 +66,13 @@ const getUserBypassword = function(email,password){
 //user authentication:
 
 app.get('/register', (req, res) => {
-  res.render('urls_register');
+  let templateVars = { urls: urlDatabase, username: users[req.cookies['user_id']] && users[req.cookies['user_id']].email };
+  res.render('urls_register', templateVars);
 })
 
 app.get('/login', (req, res) => {
-  res.render('urls_login');
+  let templateVars = { urls: urlDatabase, username: users[req.cookies['user_id']] && users[req.cookies['user_id']].email };
+  res.render('urls_login', templateVars);
 })
 
 
@@ -93,7 +95,7 @@ app.post('/register', (req, res) => {
     users[randomId]['email'] = user.email;
     users[randomId]['password'] = user.password;
     console.log(users);
-    res.cookie('user_id', users[randomId]['email']);
+    res.cookie('user_id', randomId);
     res.redirect('/urls');
   }
 
@@ -106,7 +108,7 @@ app.post('/register', (req, res) => {
 
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase, username: req.cookies['user_id'] };
+  let templateVars = { urls: urlDatabase, username: users[req.cookies['user_id']] && users[req.cookies['user_id']].email };
   res.render('urls_index', templateVars);
 });
 
@@ -170,15 +172,17 @@ app.post('/login', (req, res) => {
     res.send('Error 403: the password is not correct')
 
   }else{
+    // getUserBypassword(user.email, user.password)
+    res.cookie('user_id', getUserBypassword(user.email, user.password));
     res.redirect("/urls");
   }
 })
 
 
 //res.redirect("/urls");
-app.post('/logout', (req, res) => {
+app.get('/logout', (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/urls/login/');
+  res.redirect('/login');
 })
 
 
