@@ -4,12 +4,11 @@ const PORT = 8080;
 const alert = require("alert");
 const bodyParser = require('body-parser');
 const { getUserByEmail, getUserByEmail2 } = require('./helpers');
-//const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
-
-app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', "ejs");
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(cookieSession({
   name: 'week3day4',
   keys: ['my-secret-dont-tell']
@@ -83,7 +82,6 @@ app.post('/register', (req, res) => {
     users[randomId]['id'] = randomId;
     users[randomId]['email'] = user.email;
     users[randomId]['password'] = hashedPassword;
-    console.log(users);
     req.session.user_id = randomId;
     res.redirect('/urls');
   }
@@ -174,7 +172,6 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 //login information checking: the email and password should absolutely match to login
 app.post('/login', (req, res) => {
   const user = req.body;
-  console.log('this is user',user);
   const password = user.password;
   const email = user.email;
   const dbHash = getUserByEmail2(email,users);
