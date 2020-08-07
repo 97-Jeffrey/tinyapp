@@ -16,8 +16,8 @@ app.use(cookieSession({
 }));
 
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
+  b6UTxQ: { longURL: "https://www.tsn.ca", user_id: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", user_id: "aJ48lW" }
 };
 const users = {
   "userRandomID": {
@@ -30,16 +30,16 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk"
   }
-}
+};
 
-function generateRandomString() {
+const generateRandomString = function() {
   let alphaNum = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let randomString = '';
   for (let i = 0; i < 6; i++) {
     randomString += alphaNum[Math.floor(Math.random() * alphaNum.length)];
   }
   return randomString;
-}
+};
 
 
 
@@ -47,25 +47,25 @@ function generateRandomString() {
 // basic cases: if logged in, go to main(url) pages , if not, go to login page :
 
 app.get('/',(req, res)=>{
-  if(req.session.user_id){
+  if (req.session.user_id) {
     res.redirect('/urls');
-  }else{
+  } else {
     res.redirect('/login');
   }
-})
+});
 
 
 //user authentication:
 
 app.get('/register', (req, res) => {
-  let templateVars = { urls: urlDatabase, user_id: users[req.session['user_id']] };
+  let templateVars = { urls: urlDatabase, user_id: users[req.session["user_id"]] };
   res.render('urls_register', templateVars);
-})
+});
 
 app.get('/login', (req, res) => {
   let templateVars = { urls: urlDatabase, user_id: users[req.session['user_id']] };
   res.render('urls_login', templateVars);
-})
+});
 
 // only new people with both email and password can register successively
 app.post('/register', (req, res) => {
@@ -75,8 +75,7 @@ app.post('/register', (req, res) => {
   const hashedPassword = bcrypt.hashSync(password, 10);
   if (!user.email || !user.password) {
     res.send(`Error code 400 : please fill in both Email and password`);
-  }
-  else if (getUserByEmail(user.email, users)) {                           
+  } else if (getUserByEmail(user.email,users)) {
     res.send(`Error code 400 : this email is already registered`);
 
   } else {
@@ -85,24 +84,23 @@ app.post('/register', (req, res) => {
     users[randomId]['email'] = user.email;
     users[randomId]['password'] = hashedPassword;
     console.log(users);
-    //res.cookie('user_id', randomId); // 
-    req.session.user_id = randomId; 
+    req.session.user_id = randomId;
     res.redirect('/urls');
   }
 
-})
+});
 
 
 //User cannot go to urls if they are not logged in, when they do, they only see urls with they created;
 app.get("/urls", (req, res) => {
-  if(!req.session.user_id){
+  if (!req.session.user_id) {
     res.redirect('/login');
     alert('You need to login my friend!');
     
   }
-  let filterURL ={};
-  for(let url in urlDatabase){
-    if(urlDatabase[url].userID === req.session['user_id'] ){
+  let filterURL = {};
+  for (let url in urlDatabase) {
+    if (urlDatabase[url].user_id === req.session['user_id']) {
       filterURL[url] = urlDatabase[url];
     }
   }
@@ -113,18 +111,18 @@ app.get("/urls", (req, res) => {
 // users can not create new url if they are not logged in:
 app.get("/urls/new", (req, res) => {
   let templateVars = { urls: urlDatabase, user_id: users[req.session['user_id']]};
-  if(!templateVars["user_id"]){
+  if (!templateVars["user_id"]) {
     res.redirect('/login');
   }
   res.render("urls_new", templateVars);
-})
+});
 
 //direct to edit page:
 app.get("/urls/:shortURL", (req, res) => {
-  if(!req.session.user_id){
-     res.render('urls_error', {errorMessage:'You shoud login first!'})
-  }else if(urlDatabase[req.params.shortURL]['userID'] !== req.session.user_id){
-     res.render('urls_error', {errorMessage:'You do not own this URL!'});
+  if (!req.session.user_id) {
+    res.render('urls_error', {errorMessage:'You shoud login first!'});
+  } else if (urlDatabase[req.params.shortURL]['user_id'] !== req.session.user_id) {
+    res.render('urls_error', {errorMessage:'You do not own this URL!'});
   }
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
@@ -139,37 +137,37 @@ app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
-})
+});
 
 // direct to urls add the input url into urlDatabase, new string generated for given address:
 app.post("/urls", (req, res) => {
   let randomString = generateRandomString();
-  urlDatabase[randomString] = {longURL: req.body.longURL, userID: req.session['user_id']};
+  urlDatabase[randomString] = {longURL: req.body.longURL, user_id: req.session['user_id']};
   res.redirect(`/urls/${randomString}`);
 });
 
 // delete the url : only by user who created them (cannot delete through terminal)
 app.post("/urls/:shortURL/delete", (req, res) => {
-  if(urlDatabase[req.params.shortURL].userID === req.session['user_id']){
+  if (urlDatabase[req.params.shortURL].user_id === req.session['user_id']) {
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
-  }else{
+  } else {
     res.send('error 404: cannot delete');
   }
-})
+});
 
 // get directed to the edit page when 'edit' is clicked:
 app.get('/urls/:shortURL/edit', (req, res) => {
   res.redirect(`/urls/${req.params.shortURL}`);
-})
+});
 
 // can reassign url to generated shortURL and return to /urls page
 app.post('/urls/:shortURL/edit', (req, res) => {
-  if(urlDatabase[req.params.shortURL]["userID"] === req.session['user_id']){
+  if (urlDatabase[req.params.shortURL]["user_id"] === req.session['user_id']) {
     urlDatabase[req.params.shortURL]["longURL"] = req.body['longURL'];
     res.redirect("/urls");
   }
-})
+});
 
 
 
@@ -181,25 +179,25 @@ app.post('/login', (req, res) => {
   const email = user.email;
   const dbHash = getUserByEmail2(email,users);
   const correct = bcrypt.compareSync(password, dbHash);
-  const otherUser = getUserByEmail(email, users);                
-  if (!getUserByEmail(user.email, users)) {                      
-    res.send('Error 403: the e-mail cannot be found!')
-  } else if(!correct) {
-    res.send('Error 403: the password is not correct')
+  const otherUser = getUserByEmail(email,users);
+  if (!getUserByEmail(user.email,users)) {
+    res.send('Error 403: the e-mail cannot be found!');
+  } else if (!correct) {
+    res.send('Error 403: the password is not correct');
 
-  }else{
+  } else {
     
     req.session['user_id'] = otherUser;
     res.redirect("/urls");
   }
-})
+});
 
 
 //res.redirect("/urls");
 app.get('/logout', (req, res) => {
   req.session.user_id = null;
   res.redirect('/login');
-})
+});
 
 
 // app starts listening at designated port:
