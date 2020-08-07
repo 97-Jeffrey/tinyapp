@@ -43,17 +43,7 @@ function generateRandomString() {
 
 
 // two helper functions:
-// const getUserbyEmail = function (email, database) {
-//   let result = '';
-//   let arr = Object.keys(database);
-//   for (let user of arr) {
-//     if (database[user].email === email) {
-//       result = user;
-//       break;
-//     }
-//   }
-//   return result;
-// }
+
 
 const getUserbyEmail2 = function(email){
   let result = '';
@@ -66,7 +56,7 @@ const getUserbyEmail2 = function(email){
   }
   return result;
 }
-// helper function
+// helper function: (not in use after bcript is used)
 const getUserBypassword = function(email,password){
   let arr =Object.keys(users);
   let result;
@@ -79,7 +69,15 @@ const getUserBypassword = function(email,password){
   }
   
 }
+// basic cases: if logged in, go to main(url) pages , if not, go to login page :
 
+app.get('/',(req, res)=>{
+  if(req.session.user_id){
+    res.redirect('/urls');
+  }else{
+    res.redirect('/login');
+  }
+})
 
 
 //user authentication:
@@ -94,19 +92,16 @@ app.get('/login', (req, res) => {
   res.render('urls_login', templateVars);
 })
 
-
-
-
+// only new people with both email and password can register successively
 app.post('/register', (req, res) => {
   const randomId = generateRandomString();
   const user = req.body;
-  // const arr = Object.keys(users);
   const password = user.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
   if (!user.email || !user.password) {
     res.send(`Error code 400 : please fill in both Email and password`);
   }
-  else if (getUserbyEmail(user.email, users)) {                           // right here!!!!
+  else if (getUserbyEmail(user.email, users)) {                           
     res.send(`Error code 400 : this email is already registered`);
 
   } else {
@@ -123,24 +118,22 @@ app.post('/register', (req, res) => {
 })
 
 
-
-
-
-
-
+//User cannot go to urls if they are not logged in, when they do, they only see urls with they created;
 app.get("/urls", (req, res) => {
+  if(!req.session.user_id){
+    res.redirect('/login');
+  }
   let filterURL ={};
   for(let url in urlDatabase){
-    // console.log(req.cookies['user_id'], urlDatabase[url].userID);
     if(urlDatabase[url].userID === req.session['user_id'] ){
       filterURL[url] = urlDatabase[url];
     }
   }
-  // console.log(filterURL);
   let templateVars = { urls: filterURL, user_id: users[req.session['user_id']]};
   res.render('urls_index', templateVars);
 });
 
+// users can not create new url if they are not logged in:
 app.get("/urls/new", (req, res) => {
   let templateVars = { urls: urlDatabase, user_id: users[req.session['user_id']]};
   if(!templateVars["user_id"]){
@@ -149,6 +142,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 })
 
+//direct to edit page:
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
@@ -161,21 +155,19 @@ app.get("/urls/:shortURL", (req, res) => {
 // link the generated url to the real url users submitted, and redirect user into their address:
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const longURL = req.body.longURL;
-  //  console.log('longURL===', longURL);
-  console.log(req.params);
+  const longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 })
 
-// direct to urls add the input address into urlDatabase, new string generated for given address:
+// direct to urls add the input url into urlDatabase, new string generated for given address:
 app.post("/urls", (req, res) => {
   let randomString = generateRandomString();
   urlDatabase[randomString] = {longURL: req.body.longURL, userID: req.session['user_id']};
-  res.redirect(`/urls/${randomString}`);
+  res.redirect('/urls');
 });
 
+// delete the url : only by user who created them (cannot delete through terminal)
 app.post("/urls/:shortURL/delete", (req, res) => {
-
   if(urlDatabase[req.params.shortURL].userID === req.session['user_id']){
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
@@ -184,24 +176,22 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   }
 })
 
+// get directed to the edit page when 'edit' is clicked:
 app.get('/urls/:shortURL/edit', (req, res) => {
   res.redirect(`/urls/${req.params.shortURL}`);
 })
 
-
+// can reassign url to generated shortURL and return to /urls page
 app.post('/urls/:shortURL/edit', (req, res) => {
-  
-  
   if(urlDatabase[req.params.shortURL]["userID"] === req.session['user_id']){
     urlDatabase[req.params.shortURL]["longURL"] = req.body['longURL'];
     res.redirect("/urls");
   }
- 
 })
 
 
 
-
+//login information checking: the email and password should absolutely match to login
 app.post('/login', (req, res) => {
   const user = req.body;
   console.log('this is user',user);
@@ -209,8 +199,8 @@ app.post('/login', (req, res) => {
   const email = user.email;
   const dbHash = getUserbyEmail2(email);
   const correct = bcrypt.compareSync(password, dbHash);
-  const otherUser = getUserbyEmail(email, users);                // here
-  if (!getUserbyEmail(user.email, users)) {                      //here
+  const otherUser = getUserbyEmail(email, users);                
+  if (!getUserbyEmail(user.email, users)) {                      
     res.send('Error 403: the e-mail cannot be found!')
   } else if(!correct) {
     res.send('Error 403: the password is not correct')
@@ -225,7 +215,6 @@ app.post('/login', (req, res) => {
 
 //res.redirect("/urls");
 app.get('/logout', (req, res) => {
-  // res.clearCookie('user_id');
   req.session.user_id = null;
   res.redirect('/login');
 })
