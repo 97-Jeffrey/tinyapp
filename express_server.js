@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const PORT = 8080;
 const bodyParser = require('body-parser');
-const { getUserbyEmail } = require('./helpers');
+const { getUserByEmail, getUserByEmail2 } = require('./helpers');
 //const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
@@ -42,20 +42,7 @@ function generateRandomString() {
 }
 
 
-// two helper functions:
 
-
-const getUserbyEmail2 = function(email){
-  let result = '';
-  let arr = Object.keys(users);
-  for (let user of arr) {
-    if (users[user].email === email) {
-      result = users[user].password;
-      break;
-    }
-  }
-  return result;
-}
 // helper function: (not in use after bcript is used)
 const getUserBypassword = function(email,password){
   let arr =Object.keys(users);
@@ -101,7 +88,7 @@ app.post('/register', (req, res) => {
   if (!user.email || !user.password) {
     res.send(`Error code 400 : please fill in both Email and password`);
   }
-  else if (getUserbyEmail(user.email, users)) {                           
+  else if (getUserByEmail(user.email, users)) {                           
     res.send(`Error code 400 : this email is already registered`);
 
   } else {
@@ -197,10 +184,10 @@ app.post('/login', (req, res) => {
   console.log('this is user',user);
   const password = user.password;
   const email = user.email;
-  const dbHash = getUserbyEmail2(email);
+  const dbHash = getUserByEmail2(email,users);
   const correct = bcrypt.compareSync(password, dbHash);
-  const otherUser = getUserbyEmail(email, users);                
-  if (!getUserbyEmail(user.email, users)) {                      
+  const otherUser = getUserByEmail(email, users);                
+  if (!getUserByEmail(user.email, users)) {                      
     res.send('Error 403: the e-mail cannot be found!')
   } else if(!correct) {
     res.send('Error 403: the password is not correct')
