@@ -88,6 +88,25 @@ app.post('/register', (req, res) => {
 
 });
 
+//login information checking: the email and password should absolutely match to registered one
+app.post('/login', (req, res) => {
+  const user = req.body;
+  const password = user.password;
+  const email = user.email;
+  const dbHash = getUserByEmail2(email,users);
+  const correct = bcrypt.compareSync(password, dbHash);
+  const otherUser = getUserByEmail(email,users);
+  if (!getUserByEmail(user.email,users)) {
+    res.send('Error 403: the e-mail cannot be found!');
+  } else if (!correct) {
+    res.send('Error 403: the password is not correct');
+
+  } else {
+    
+    req.session['user_id'] = otherUser;
+    res.redirect("/urls");
+  }
+});
 
 //User cannot go to urls if they are not logged in, when they do, they only see urls with they created;
 app.get("/urls", (req, res) => {
@@ -166,28 +185,6 @@ app.get('/urls/:shortURL/edit', (req, res) => {
 app.post('/urls/:shortURL/edit', (req, res) => {
   if (urlDatabase[req.params.shortURL]["user_id"] === req.session['user_id']) {
     urlDatabase[req.params.shortURL]["longURL"] = req.body['longURL'];
-    res.redirect("/urls");
-  }
-});
-
-
-
-//login information checking: the email and password should absolutely match to login
-app.post('/login', (req, res) => {
-  const user = req.body;
-  const password = user.password;
-  const email = user.email;
-  const dbHash = getUserByEmail2(email,users);
-  const correct = bcrypt.compareSync(password, dbHash);
-  const otherUser = getUserByEmail(email,users);
-  if (!getUserByEmail(user.email,users)) {
-    res.send('Error 403: the e-mail cannot be found!');
-  } else if (!correct) {
-    res.send('Error 403: the password is not correct');
-
-  } else {
-    
-    req.session['user_id'] = otherUser;
     res.redirect("/urls");
   }
 });
