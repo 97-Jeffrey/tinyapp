@@ -95,7 +95,7 @@ app.get("/urls", (req, res) => {
     res.redirect('/login');
     alert('You need to login my friend!');
     
-  }
+  } else {
   let filterURL = {};
   for (let url in urlDatabase) {
     if (urlDatabase[url].user_id === req.session['user_id']) {
@@ -104,6 +104,7 @@ app.get("/urls", (req, res) => {
   }
   let templateVars = { urls: filterURL, user_id: users[req.session['user_id']]};
   res.render('urls_index', templateVars);
+}
 });
 
 // users can not create new url if they are not logged in:
@@ -111,8 +112,9 @@ app.get("/urls/new", (req, res) => {
   let templateVars = { urls: urlDatabase, user_id: users[req.session['user_id']]};
   if (!templateVars["user_id"]) {
     res.redirect('/login');
-  }
+  } else {
   res.render("urls_new", templateVars);
+  }
 });
 
 //direct to edit page:
@@ -121,12 +123,13 @@ app.get("/urls/:shortURL", (req, res) => {
     res.render('urls_error', {errorMessage:'You shoud login first!'});
   } else if (urlDatabase[req.params.shortURL]['user_id'] !== req.session.user_id) {
     res.render('urls_error', {errorMessage:'You do not own this URL!'});
-  }
+  } else {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
   const user_id = users[req.session['user_id']];
   let templateVars = { shortURL, longURL, user_id };
   res.render("urls_show", templateVars);
+  }
 });
 
 
