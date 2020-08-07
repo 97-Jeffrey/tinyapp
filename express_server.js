@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const PORT = 8080;
+const alert = require("alert");
 const bodyParser = require('body-parser');
 const { getUserByEmail, getUserByEmail2 } = require('./helpers');
 //const cookieParser = require('cookie-parser');
@@ -8,7 +9,6 @@ const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 
 app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(cookieParser());
 app.set('view engine', "ejs");
 app.use(cookieSession({
   name: 'week3day4',
@@ -43,19 +43,7 @@ function generateRandomString() {
 
 
 
-// helper function: (not in use after bcript is used)
-const getUserBypassword = function(email,password){
-  let arr =Object.keys(users);
-  let result;
-  for(let user of arr){
-    if(users[user].email === email){
-      if(users[user].password === password){
-        return user;
-      }
-    }
-  }
-  
-}
+
 // basic cases: if logged in, go to main(url) pages , if not, go to login page :
 
 app.get('/',(req, res)=>{
@@ -109,6 +97,8 @@ app.post('/register', (req, res) => {
 app.get("/urls", (req, res) => {
   if(!req.session.user_id){
     res.redirect('/login');
+    alert('You need to login my friend!');
+    
   }
   let filterURL ={};
   for(let url in urlDatabase){
@@ -131,6 +121,11 @@ app.get("/urls/new", (req, res) => {
 
 //direct to edit page:
 app.get("/urls/:shortURL", (req, res) => {
+  if(!req.session.user_id){
+     res.render('urls_error', {errorMessage:'You shoud login first!'})
+  }else if(urlDatabase[req.params.shortURL]['userID'] !== req.session.user_id){
+     res.render('urls_error', {errorMessage:'You do not own this URL!'});
+  }
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
   const user_id = users[req.session['user_id']];
@@ -150,7 +145,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/urls", (req, res) => {
   let randomString = generateRandomString();
   urlDatabase[randomString] = {longURL: req.body.longURL, userID: req.session['user_id']};
-  res.redirect('/urls');
+  res.redirect(`/urls/${randomString}`);
 });
 
 // delete the url : only by user who created them (cannot delete through terminal)
