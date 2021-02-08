@@ -4,10 +4,13 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-Entered Long URL with shortened
+Entered Long URL with shortened version:
 !["urls"](https://github.com/97-Jeffrey/tinyapp/blob/master/doc/Screen%20Shot%202021-02-07%20at%208.58.20%20PM.png?raw=true)
 
-### some demo pictures:
+Every Created URL could be edited:
+!["edit](https://github.com/97-Jeffrey/tinyapp/blob/master/doc/Screen%20Shot%202021-02-07%20at%209.00.18%20PM.png?raw=true)
+
+### Some Code Snippets:
 
 !["The beginning state"](https://github.com/97-Jeffrey/tinyapp/blob/master/doc/Screen%20Shot%202020-08-06%20at%208.58.34%20PM.png?raw=true)
 !["Numerous GET and Post"](https://github.com/97-Jeffrey/tinyapp/blob/master/doc/Screen%20Shot%202020-08-06%20at%209.02.33%20PM.png?raw=true)
