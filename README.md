@@ -3,7 +3,12 @@
 TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly).
 
 ## Final Product
+
+Entered Long URL with shortened
+!["urls"](https://github.com/97-Jeffrey/tinyapp/blob/master/doc/Screen%20Shot%202021-02-07%20at%208.58.20%20PM.png?raw=true)
+
 ### some demo pictures:
+
 !["The beginning state"](https://github.com/97-Jeffrey/tinyapp/blob/master/doc/Screen%20Shot%202020-08-06%20at%208.58.34%20PM.png?raw=true)
 !["Numerous GET and Post"](https://github.com/97-Jeffrey/tinyapp/blob/master/doc/Screen%20Shot%202020-08-06%20at%209.02.33%20PM.png?raw=true)
 !["One of rendered html pages"](https://github.com/97-Jeffrey/tinyapp/blob/master/doc/Screen%20Shot%202020-08-06%20at%209.03.56%20PM.png?raw=true)
@@ -21,7 +26,6 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 - Install all dependencies (using the `npm install` command)
 
-
 ```
 install express: npm install express;
 
@@ -33,5 +37,6 @@ install body-parser : npm install body-parser
 
 install cookie session: npm install cookie-session
 ```
+
 - Run the development web server using the `node express_server.js` command.
-- after Nodemon is installed, type `npm start` to run 
+- after Nodemon is installed, type `npm start` to run
